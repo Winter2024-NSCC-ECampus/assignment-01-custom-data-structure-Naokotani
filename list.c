@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 typedef struct Node {
-  struct Node *prev;
   struct Node *next;
   void *value;
 } Node;
@@ -16,45 +15,65 @@ typedef struct LinkedList {
 
 LinkedList append(LinkedList list, void *ptr);
 LinkedList prepend(LinkedList list, void *ptr);
-LinkedList create(size_t size);
-void *allocate_node(size_t size);
-void *getFirst(LinkedList list);
-void *getLast(LinkedList list);
-void *car(Node *node) { return node->value; }
-void *cdr(Node *node) { return node->next->value; }
+Node *rem(Node *node);
+LinkedList create(void *ptr, size_t size);
+// void *last(LinkedList list) { return list.first->prev; }
+void freeLinkedList(LinkedList list);
+void *first(LinkedList list) { return list.first->value; }
 
-void *getFirst(LinkedList list) { return list.first->value; }
-void *getLast(LinkedList list) { return list.last->value; }
+LinkedList rest(LinkedList list) {
+  // TODO error
+  printf("Rest list\n");
+  if (list.size == 1) {
+    return list;
+    printf("List contains only one node");
+  }
 
-LinkedList create(size_t size) {
+  Node *currNode = list.first->next;
+  printf("First element added to new list is %d\n", *((int *)currNode->value));
+  LinkedList newList = create(currNode->value, list.typeSize);
+
+  if (list.size > 2) {
+    currNode = currNode->next;
+  }
+
+  while (currNode != NULL) {
+    printf("looping to add to list\n");
+    printf("adding %d to list\n", *((int *)currNode->value));
+    newList = append(newList, currNode->value);
+    currNode = currNode->next;
+  }
+
+  printf("\n\n");
+
+  return newList;
+}
+
+LinkedList create(void *ptr, size_t size) {
   LinkedList list;
+  Node *node = malloc(sizeof(Node));
+  node->value = malloc(list.typeSize);
   list.typeSize = size;
-  list.size = 0;
-  list.first = NULL;
-  list.last = NULL;
+  list.size = 1;
+  list.first = node;
+  list.last = node;
+  node->value = ptr;
+  node->next = NULL;
   return list;
 }
 
-void *allocate_node(size_t size) { return malloc(sizeof(Node) * 2 + size); }
+void freeLinkedList(LinkedList list) {
+  LinkedList freeList = list;
+  Node *currNode = list.first;
+  Node *nextNode = list.first->next;
+  while (&freeList.first->next != &currNode) {
+  }
+}
 
 LinkedList prepend(LinkedList list, void *ptr) {
-  Node *node = allocate_node(list.typeSize);
-
-  if (list.size > 1) {
-    node->next = list.first;
-    node->prev = list.last;
-    list.first->prev = node;
-  }
-
-  if (list.size == 1) {
-    list.last->next = node;
-  }
-
-  if (list.size == 0) {
-    list.first = node;
-    list.last = node;
-  } else {
-    list.first = node;
+  Node *node = malloc(sizeof(Node));
+  if (sizeof(ptr) != list.typeSize) {
+    node->value = malloc(sizeof(list.typeSize));
   }
 
   node->value = ptr;
@@ -64,28 +83,16 @@ LinkedList prepend(LinkedList list, void *ptr) {
 }
 
 LinkedList append(LinkedList list, void *ptr) {
-  Node *node = allocate_node(list.typeSize);
+  Node *node = malloc(sizeof(Node));
+  void *value = malloc(list.typeSize);
+  memcpy(value, ptr, list.typeSize);
+  node->value = value;
+  Node *last = list.last;
 
-  if (list.size > 1) {
-    node->prev = list.first;
-    node->next = list.last;
-    list.last->next = node;
-  }
+  printf("Appending %d to list\n", *((int *)ptr));
 
-  if (list.size == 1) {
-    list.first->prev = node;
-  }
-
-  if (list.size == 0) {
-    list.first = node;
-    list.last = node;
-    node->next = node;
-    node->prev = node;
-  } else {
-    list.last = node;
-  }
-
-  node->value = ptr;
+  last->next = node;
+  node->next = NULL;
 
   list.size += 1;
 
@@ -93,31 +100,23 @@ LinkedList append(LinkedList list, void *ptr) {
 }
 
 int main() {
-  LinkedList list = create(sizeof(int));
-  Node node;
   int num1 = 1;
   int num2 = 2;
   int num3 = 3;
-  int num4 = 0;
+  int num4 = 4;
+  Node node;
+  LinkedList list = create(&num1, sizeof(int));
   list = append(list, &num1);
   list = append(list, &num2);
   list = append(list, &num3);
+  list = append(list, &num4);
 
-  printf("The first nubmer is %d\n", *((int *)getFirst(list)));
-  printf("The last number is %d\n", *((int *)getLast(list)));
+  printf("The first of the list is %d\n", *((int *)list.first->value));
+  printf("The first of the list is %d\n", *((int *)list.first->next->value));
 
-  Node *second = list.first->next;
-  printf("The second number is %d\n", *((int *)second->value));
-  Node *node1 = getFirst(list);
+  LinkedList secondList = rest(list);
 
-  int *result = car(node1);
-  int *result2 = cdr(node1);
+  printf("The first of the list is %d\n", *((int *)secondList.first->value));
 
-  list = prepend(list, &num4);
-
-  printf("The first nubmer is %d\n", *((int *)getFirst(list)));
-  printf("The last number is %d\n", *((int *)getLast(list)));
-
-  printf("Hello, World!\n");
   return 0;
 }
