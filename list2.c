@@ -120,6 +120,42 @@ void pop(LinkedList *list) {
   prevNode->next = NULL;
 }
 
+size_t findFirstRecur(LinkedList list, int value, size_t currIndex) {
+  LinkedList newList = rest(list);
+  Node *firstNode = first(list);
+  if (*head(newList) != value) {
+    if (newList.first->next != NULL) {
+      currIndex = findFirstRecur(newList, value, ++currIndex);
+    } else {
+      currIndex = -1;
+    }
+  }
+  freeList(newList);
+  return currIndex;
+}
+
+size_t findFirst(LinkedList list, int value) {
+  size_t currIndex = 0;
+  Node *firstNode = first(list);
+  if (*head(list) != value) {
+    if (firstNode->next != NULL) {
+      currIndex = findFirstRecur(list, value, ++currIndex);
+    } else {
+      currIndex = -1;
+    }
+  }
+  return currIndex;
+}
+
+int contains(LinkedList list, int value) {
+  int found = findFirst(list, value);
+  if (found >= 0) {
+    return 1;
+  } else {
+    return -1;
+  }
+}
+
 int main() {
   int num1 = 1;
   int num2 = 2;
@@ -188,6 +224,18 @@ int main() {
 
   printf("list first after pop %d\n", *((int *)list.first->value));
   printf("list last after pop %d\n\n\n", *((int *)list.last->value));
+
+  size_t i = findFirst(list, 2);
+  printf("The index is %ld\n", i);
+
+  size_t unfound = findFirst(list, 22);
+  printf("The index is %ld\n", unfound);
+
+  int found = contains(list, 2);
+  int notFound = contains(list, 22222);
+
+  printf("found is %d\n", found);
+  printf("not found is %d\n", notFound);
 
   return 0;
 }
