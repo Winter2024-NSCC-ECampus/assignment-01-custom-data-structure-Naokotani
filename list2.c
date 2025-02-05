@@ -13,6 +13,12 @@ typedef struct LinkedList {
   struct Node *last;
 } LinkedList;
 
+size_t size(LinkedList list) { return list.size; }
+int *head(LinkedList list) { return list.first->value; }
+int *tail(LinkedList list) { return list.last->value; }
+Node *first(LinkedList list) { return list.first; }
+Node *last(LinkedList list) { return list.last; }
+
 LinkedList create(int *value) {
   Node *node = malloc(sizeof(Node));
   node->value = value;
@@ -77,6 +83,30 @@ LinkedList rest(LinkedList list) {
   return newList;
 }
 
+Node *getIndexRecur(LinkedList list, int index, int currIndex) {
+  Node *node;
+  LinkedList newList = rest(list);
+  printf("created new list\n");
+
+  if (index == currIndex) {
+    printf("indices match \n");
+    node = first(newList);
+  } else {
+    node = getIndexRecur(list, index, ++currIndex);
+  }
+  freeList(newList);
+  return node;
+}
+
+Node *getIndex(LinkedList list, int index) {
+  int currIndex = 0;
+  if (index == currIndex) {
+    return first(list);
+  } else {
+    return getIndexRecur(list, index, ++currIndex);
+  }
+}
+
 int main() {
   int num1 = 1;
   int num2 = 2;
@@ -133,8 +163,10 @@ int main() {
 
   printf("rest after prepend first of secondList is %d\n",
          *((int *)secondList.first->value));
-  printf("rest after prepend last of secondList is %d\n",
+  printf("rest after prepend last of secondList is %d\n\n\n",
          *((int *)secondList.last->value));
+
+  Node *gotNode = getIndex(list, 2);
 
   return 0;
 }
