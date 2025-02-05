@@ -107,6 +107,19 @@ Node *getIndex(LinkedList list, int index) {
   }
 }
 
+void pop(LinkedList *list) {
+  Node *prevNode;
+  Node *currNode = first(*list);
+  while (currNode->next != NULL) {
+    prevNode = currNode;
+    currNode = currNode->next;
+  }
+
+  free(currNode);
+  list->last = prevNode;
+  prevNode->next = NULL;
+}
+
 int main() {
   int num1 = 1;
   int num2 = 2;
@@ -167,6 +180,14 @@ int main() {
          *((int *)secondList.last->value));
 
   Node *gotNode = getIndex(list, 2);
+
+  printf("list first before pop %d\n", *((int *)list.first->value));
+  printf("list last before pop %d\n\n\n", *((int *)list.last->value));
+
+  pop(&list);
+
+  printf("list first after pop %d\n", *((int *)list.first->value));
+  printf("list last after pop %d\n\n\n", *((int *)list.last->value));
 
   return 0;
 }
