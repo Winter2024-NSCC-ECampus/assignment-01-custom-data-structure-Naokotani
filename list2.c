@@ -34,6 +34,15 @@ LinkedList append(LinkedList list, int *value) {
   return list;
 }
 
+LinkedList prepend(LinkedList list, int *value) {
+  Node *node = malloc(sizeof(Node));
+  node->next = list.first;
+  node->value = value;
+  list.first = node;
+  list.size += 1;
+  return list;
+}
+
 void freeList(LinkedList list) {
   Node *currNode = list.first;
 
@@ -103,10 +112,29 @@ int main() {
 
   printf("first list size is %ld\n\n", fourthList.size);
 
-  freeList(list);
-  freeList(secondList);
-  freeList(thirdList);
-  freeList(fourthList);
+  int newNum = 7;
+  secondList = append(secondList, &newNum);
+  int anohterNum = 9;
+  secondList = prepend(secondList, &anohterNum);
+
+  printf("prepend first of secondList is %d\n",
+         *((int *)secondList.first->value));
+  printf("prepend last of secondList is %d\n",
+         *((int *)secondList.last->value));
+
+  fourthList = prepend(fourthList, &newNum);
+
+  printf("prepend first of fourthList is %d\n",
+         *((int *)fourthList.first->value));
+  printf("prepend last of fourthList is %d\n",
+         *((int *)fourthList.last->value));
+
+  secondList = rest(secondList);
+
+  printf("rest after prepend first of secondList is %d\n",
+         *((int *)secondList.first->value));
+  printf("rest after prepend last of secondList is %d\n",
+         *((int *)secondList.last->value));
 
   return 0;
 }
