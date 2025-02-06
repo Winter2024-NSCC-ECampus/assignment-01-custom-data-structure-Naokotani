@@ -97,4 +97,7 @@ int contains(LinkedList list, char *string);
  */
 void printNode(Node *node);
 
-String *createString(char *ptr);
+/*
+ * Prints the entire list.
+ */
+void printList(LinkedList);

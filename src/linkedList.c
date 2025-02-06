@@ -166,3 +166,19 @@ void printNode(Node *node) {
   printf("%s\n", str);
   free(str);
 }
+
+void printList(LinkedList list) {
+  Node *currNode = first(list);
+  while (currNode != NULL) {
+    char *str = malloc(sizeof(char) * currNode->string->length);
+    strcpy(str, currNode->string->string);
+    printf("%s", str);
+    free(str);
+    Node *freeNode = currNode;
+    currNode = currNode->next;
+    free(freeNode->string->string);
+    free(freeNode->string);
+    free(freeNode);
+  }
+  printf("\n");
+}

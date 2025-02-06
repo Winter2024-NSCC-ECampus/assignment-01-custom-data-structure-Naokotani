@@ -2,10 +2,10 @@
 #include <stdio.h>
 
 int main() {
-  LinkedList list = create("Hello");
+  LinkedList list = create("Hello ");
 
-  list = append(list, "how");
-  list = append(list, "are");
+  list = append(list, "are ");
+  list = append(list, "how ");
   list = append(list, "you?");
 
   printNode(first(list));
@@ -65,5 +65,14 @@ int main() {
   freeList(thirdList);
   freeList(fourthList);
 
+  LinkedList pList = create("I ");
+  pList = append(pList, "am ");
+  pList = append(pList, "going ");
+  pList = append(pList, "to ");
+  pList = append(pList, "print ");
+  pList = append(pList, "this ");
+  pList = append(pList, "list.");
+
+  printList(pList);
   return 0;
 }
