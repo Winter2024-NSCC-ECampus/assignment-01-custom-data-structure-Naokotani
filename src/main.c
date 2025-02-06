@@ -1,16 +1,12 @@
 #include "linkedList.h"
+#include <stdio.h>
 
 int main() {
-  String *string1 = createString("Hello");
-  String *string2 = createString("how");
-  String *string3 = createString("are");
-  String *string4 = createString("you?");
+  LinkedList list = create("Hello");
 
-  LinkedList list = create(string1);
-
-  list = append(list, string2);
-  list = append(list, string3);
-  list = append(list, string4);
+  list = append(list, "how");
+  list = append(list, "are");
+  list = append(list, "you?");
 
   printNode(first(list));
   printNode(last(list));
@@ -38,8 +34,15 @@ int main() {
   printf("After popping second list last node is:\n");
   printNode(last(secondList));
   printf("Appending it back on and last node is\n");
-  secondList = append(secondList, string4);
+  secondList = append(secondList, "you?");
   printNode(last(secondList));
+
+  printf("Before prepend second list last node is:\n");
+  printNode(first(secondList));
+  secondList = prepend(secondList, "Yo, ");
+  printf("After prepend second list last node is:\n");
+  printNode(first(secondList));
+  printf("\n");
 
   int index = 1;
   printf("String at node %d is:\n", index);
@@ -57,6 +60,10 @@ int main() {
 
   printf("found is %d\n", found);
   printf("not found is %d\n", notFound);
+  freeList(list);
+  freeList(secondList);
+  freeList(thirdList);
+  freeList(fourthList);
 
   return 0;
 }

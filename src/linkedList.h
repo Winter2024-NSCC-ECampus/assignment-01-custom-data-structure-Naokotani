@@ -46,19 +46,19 @@ Node *last(LinkedList list);
 /*
  *  Creates and initilizes a new `LinkedList`
  */
-LinkedList create(String *string);
+LinkedList create(char string[]);
 
 /*
  *  Apeend a `Node` after the final `Node` of a linked list.
  *  the value is the value to be placed in node->value.
  */
-LinkedList append(LinkedList list, String *string);
+LinkedList append(LinkedList list, char string[]);
 
 /*
  *  Prepends a `Node` before first `Node` of a linked list.
  *  the value is the value to be placed in node->value.
  */
-LinkedList prepend(LinkedList list, String string);
+LinkedList prepend(LinkedList list, char *string);
 
 /*
  *  Frees the memory for a linked List.

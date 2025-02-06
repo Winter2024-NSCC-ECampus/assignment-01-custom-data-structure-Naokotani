@@ -1,5 +1,4 @@
 #include "linkedList.h"
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,12 +9,12 @@ String *tail(LinkedList list) { return list.last->string; }
 Node *first(LinkedList list) { return list.first; }
 Node *last(LinkedList list) { return list.last; }
 
-LinkedList create(String *string) {
+LinkedList create(char *string) {
   Node *node = malloc(sizeof(Node));
   node->string = malloc(sizeof(String));
-  node->string->string = malloc(sizeof(char) * string->length);
-  node->string->length = string->length;
-  strcpy(node->string->string, string->string);
+  node->string->length = strlen(string) + 1;
+  node->string->string = malloc(sizeof(char) * node->string->length);
+  strcpy(node->string->string, string);
   node->next = NULL;
   LinkedList list;
   list.first = node;
@@ -24,12 +23,12 @@ LinkedList create(String *string) {
   return list;
 }
 
-LinkedList append(LinkedList list, String *string) {
+LinkedList append(LinkedList list, char *string) {
   Node *node = malloc(sizeof(Node));
   node->string = malloc(sizeof(String));
-  node->string->string = malloc(sizeof(char) * string->length);
-  node->string->length = string->length;
-  strcpy(node->string->string, string->string);
+  node->string->length = strlen(string) + 1;
+  node->string->string = malloc(sizeof(char) * node->string->length);
+  strcpy(node->string->string, string);
   list.last->next = node;
   list.last = node;
   node->next = NULL;
@@ -37,12 +36,12 @@ LinkedList append(LinkedList list, String *string) {
   return list;
 }
 
-LinkedList prepend(LinkedList list, String string) {
+LinkedList prepend(LinkedList list, char *string) {
   Node *node = malloc(sizeof(Node));
-  String *stringPtr = malloc(sizeof(String));
-  stringPtr->string = malloc(sizeof(char) * string.length);
-  stringPtr->length = string.length;
-  strcpy(stringPtr->string, string.string);
+  node->string = malloc(sizeof(String));
+  node->string->length = strlen(string) + 1;
+  node->string->string = malloc(sizeof(char) * node->string->length);
+  strcpy(node->string->string, string);
   node->next = list.first;
   list.first = node;
   list.size += 1;
@@ -55,6 +54,7 @@ void freeList(LinkedList list) {
   while (currNode != NULL) {
     Node *freeNode = currNode;
     free(freeNode->string->string);
+    free(freeNode->string);
     currNode = currNode->next;
     free(freeNode);
   }
@@ -68,7 +68,7 @@ LinkedList rest(LinkedList list) {
 
   Node *currNode = first(list)->next;
   LinkedList newList;
-  newList = create(currNode->string);
+  newList = create(currNode->string->string);
   currNode = currNode->next;
 
   String *currString = malloc(sizeof(String));
@@ -76,7 +76,7 @@ LinkedList rest(LinkedList list) {
     currString->string = malloc(currNode->string->length);
     currString->length = currNode->string->length;
     strcpy(currString->string, currNode->string->string);
-    newList = append(newList, currString);
+    newList = append(newList, currString->string);
     currNode = currNode->next;
     free(currString->string);
   }
@@ -97,8 +97,6 @@ void getIndexRecur(LinkedList list, int index, int currIndex) {
 }
 
 void getIndex(LinkedList list, int index) {
-
-  // TODO error
   if (index == (int)list.size) {
     printf("Index is out of bounds");
     return;
@@ -120,6 +118,8 @@ void pop(LinkedList *list) {
     currNode = currNode->next;
   }
 
+  free(currNode->string->string);
+  free(currNode->string);
   free(currNode);
   list->last = prevNode;
   prevNode->next = NULL;
@@ -165,12 +165,4 @@ void printNode(Node *node) {
   strcpy(str, node->string->string);
   printf("%s\n", str);
   free(str);
-}
-
-String *createString(char ptr[]) {
-  String *string = malloc(sizeof(String));
-  string->length = strlen(ptr) + 1;
-  string->string = malloc(sizeof(char) * string->length);
-  strcpy(string->string, ptr);
-  return string;
 }
