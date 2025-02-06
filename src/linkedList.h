@@ -101,3 +101,8 @@ void printNode(Node *node);
  * Prints the entire list.
  */
 void printList(LinkedList);
+
+/*
+ * Remove node at index.
+ */
+int removeIndex(LinkedList list, int index);

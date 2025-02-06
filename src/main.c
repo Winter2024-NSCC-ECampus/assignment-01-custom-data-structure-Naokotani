@@ -69,10 +69,31 @@ int main() {
   pList = append(pList, "am ");
   pList = append(pList, "going ");
   pList = append(pList, "to ");
+  pList = append(pList, "mistake ");
   pList = append(pList, "print ");
   pList = append(pList, "this ");
   pList = append(pList, "list.");
 
+  removeIndex(pList, 4);
   printList(pList);
+  freeList(pList);
+
+  // for (int i = 0; i < 90000000; i++) {
+  //   char *string;
+  //   asprintf(&string, "%d\n", i);
+  //   pList = append(pList, string);
+  //   free(string);
+  // }
+
+  // LinkedList breakList = rest(pList);
+  //
+  // pList = append(pList, "gone.");
+  //
+  // pop(&pList);
+  //
+  // printList(pList);
+  // printNode(first(breakList));
+  // printNode(last(breakList));
+  // freeList(breakList);
   return 0;
 }
