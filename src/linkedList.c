@@ -1,17 +1,21 @@
 #include "linkedList.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 size_t size(LinkedList list) { return list.size; }
-int *head(LinkedList list) { return list.first->value; }
-int *tail(LinkedList list) { return list.last->value; }
+String *head(LinkedList list) { return list.first->string; }
+String *tail(LinkedList list) { return list.last->string; }
 Node *first(LinkedList list) { return list.first; }
 Node *last(LinkedList list) { return list.last; }
 
-LinkedList create(int *value) {
+LinkedList create(String *string) {
   Node *node = malloc(sizeof(Node));
-  node->value = value;
+  node->string = malloc(sizeof(String));
+  node->string->string = malloc(sizeof(char) * string->length);
+  node->string->length = string->length;
+  strcpy(node->string->string, string->string);
   node->next = NULL;
   LinkedList list;
   list.first = node;
@@ -20,20 +24,26 @@ LinkedList create(int *value) {
   return list;
 }
 
-LinkedList append(LinkedList list, int *value) {
+LinkedList append(LinkedList list, String *string) {
   Node *node = malloc(sizeof(Node));
+  node->string = malloc(sizeof(String));
+  node->string->string = malloc(sizeof(char) * string->length);
+  node->string->length = string->length;
+  strcpy(node->string->string, string->string);
   list.last->next = node;
   list.last = node;
-  node->value = value;
   node->next = NULL;
   list.size += 1;
   return list;
 }
 
-LinkedList prepend(LinkedList list, int *value) {
+LinkedList prepend(LinkedList list, String string) {
   Node *node = malloc(sizeof(Node));
+  String *stringPtr = malloc(sizeof(String));
+  stringPtr->string = malloc(sizeof(char) * string.length);
+  stringPtr->length = string.length;
+  strcpy(stringPtr->string, string.string);
   node->next = list.first;
-  node->value = value;
   list.first = node;
   list.size += 1;
   return list;
@@ -44,6 +54,7 @@ void freeList(LinkedList list) {
 
   while (currNode != NULL) {
     Node *freeNode = currNode;
+    free(freeNode->string->string);
     currNode = currNode->next;
     free(freeNode);
   }
@@ -55,45 +66,49 @@ LinkedList rest(LinkedList list) {
     return list;
   }
 
-  Node *currNode = list.first->next;
-  int *currValue = malloc(sizeof(int));
-  currValue = currNode->value;
-
+  Node *currNode = first(list)->next;
   LinkedList newList;
-  newList = create(currValue);
+  newList = create(currNode->string);
   currNode = currNode->next;
 
+  String *currString = malloc(sizeof(String));
   while (currNode != NULL) {
-    int *currValue = malloc(sizeof(int));
-    memcpy(currValue, currNode->value, sizeof(int));
-    newList = append(newList, currValue);
+    currString->string = malloc(currNode->string->length);
+    currString->length = currNode->string->length;
+    strcpy(currString->string, currNode->string->string);
+    newList = append(newList, currString);
     currNode = currNode->next;
+    free(currString->string);
   }
+  free(currString);
 
   return newList;
 }
 
-Node *getIndexRecur(LinkedList list, int index, int currIndex) {
-  Node *node;
+void getIndexRecur(LinkedList list, int index, int currIndex) {
   LinkedList newList = rest(list);
-  printf("created new list\n");
 
   if (index == currIndex) {
-    printf("indices match \n");
-    node = first(newList);
+    printNode(first(newList));
   } else {
-    node = getIndexRecur(list, index, ++currIndex);
+    getIndexRecur(list, index, ++currIndex);
   }
   freeList(newList);
-  return node;
 }
 
-Node *getIndex(LinkedList list, int index) {
+void getIndex(LinkedList list, int index) {
+
+  // TODO error
+  if (index == (int)list.size) {
+    printf("Index is out of bounds");
+    return;
+  }
+
   int currIndex = 0;
   if (index == currIndex) {
-    return first(list);
+    printNode(first(list));
   } else {
-    return getIndexRecur(list, index, ++currIndex);
+    getIndexRecur(list, index, ++currIndex);
   }
 }
 
@@ -110,12 +125,11 @@ void pop(LinkedList *list) {
   prevNode->next = NULL;
 }
 
-size_t findFirstRecur(LinkedList list, int value, size_t currIndex) {
+size_t findFirstRecur(LinkedList list, char *string, size_t currIndex) {
   LinkedList newList = rest(list);
-  Node *firstNode = first(list);
-  if (*head(newList) != value) {
+  if (strcmp(head(newList)->string, string)) {
     if (newList.first->next != NULL) {
-      currIndex = findFirstRecur(newList, value, ++currIndex);
+      currIndex = findFirstRecur(newList, string, ++currIndex);
     } else {
       currIndex = -1;
     }
@@ -124,12 +138,12 @@ size_t findFirstRecur(LinkedList list, int value, size_t currIndex) {
   return currIndex;
 }
 
-size_t findFirst(LinkedList list, int value) {
+size_t findFirst(LinkedList list, char *string) {
   size_t currIndex = 0;
   Node *firstNode = first(list);
-  if (*head(list) != value) {
+  if (strcmp(head(list)->string, string)) {
     if (firstNode->next != NULL) {
-      currIndex = findFirstRecur(list, value, ++currIndex);
+      currIndex = findFirstRecur(list, string, ++currIndex);
     } else {
       currIndex = -1;
     }
@@ -137,11 +151,26 @@ size_t findFirst(LinkedList list, int value) {
   return currIndex;
 }
 
-int contains(LinkedList list, int value) {
-  int found = findFirst(list, value);
+int contains(LinkedList list, char *string) {
+  int found = findFirst(list, string);
   if (found >= 0) {
     return 1;
   } else {
     return 0;
   }
+}
+
+void printNode(Node *node) {
+  char *str = malloc(sizeof(char) * node->string->length);
+  strcpy(str, node->string->string);
+  printf("%s\n", str);
+  free(str);
+}
+
+String *createString(char ptr[]) {
+  String *string = malloc(sizeof(String));
+  string->length = strlen(ptr) + 1;
+  string->string = malloc(sizeof(char) * string->length);
+  strcpy(string->string, ptr);
+  return string;
 }

@@ -2,9 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct String {
+  size_t length;
+  char *string;
+} String;
+
 typedef struct Node {
   struct Node *next;
-  int *value;
+  String *string;
 } Node;
 
 typedef struct LinkedList {
@@ -21,12 +26,12 @@ size_t size(LinkedList list);
 /*
  * Gets the value in the first node of the linked list.
  */
-int *head(LinkedList list);
+String *head(LinkedList list);
 
 /*
  * Gets the value in the final node of the linked list.
  */
-int *tail(LinkedList list);
+String *tail(LinkedList list);
 
 /*
  *  Retrieves the first `Node` from the linked list;
@@ -41,19 +46,19 @@ Node *last(LinkedList list);
 /*
  *  Creates and initilizes a new `LinkedList`
  */
-LinkedList create(int *value);
+LinkedList create(String *string);
 
 /*
  *  Apeend a `Node` after the final `Node` of a linked list.
  *  the value is the value to be placed in node->value.
  */
-LinkedList append(LinkedList list, int *value);
+LinkedList append(LinkedList list, String *string);
 
 /*
  *  Prepends a `Node` before first `Node` of a linked list.
  *  the value is the value to be placed in node->value.
  */
-LinkedList prepend(LinkedList list, int *value);
+LinkedList prepend(LinkedList list, String string);
 
 /*
  *  Frees the memory for a linked List.
@@ -69,7 +74,7 @@ LinkedList rest(LinkedList list);
 /*
  *  used to recursively search through a linked list if the index is not 0.
  */
-Node *getIndex(LinkedList list, int index);
+void getIndex(LinkedList list, int index);
 
 /*
  * Removes the final element from a `LinkedList`.
@@ -79,10 +84,17 @@ void pop(LinkedList *list);
 /*
  * Finds the index of the first `Node` where node->value equals `value`
  */
-size_t findFirst(LinkedList list, int value);
+size_t findFirst(LinkedList list, char *string);
 
 /*
  * Searched through a `LinkedList` to check if it contains `value`
  * returns 1 if present and 0 if not present;
  */
-int contains(LinkedList list, int value);
+int contains(LinkedList list, char *string);
+
+/**
+ * Prints the string in a node.
+ */
+void printNode(Node *node);
+
+String *createString(char *ptr);

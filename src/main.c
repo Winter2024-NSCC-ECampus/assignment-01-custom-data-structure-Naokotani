@@ -1,82 +1,59 @@
 #include "linkedList.h"
 
 int main() {
-  int num1 = 1;
-  int num2 = 2;
-  int num3 = 3;
-  int num4 = 4;
+  String *string1 = createString("Hello");
+  String *string2 = createString("how");
+  String *string3 = createString("are");
+  String *string4 = createString("you?");
 
-  LinkedList list = create(&num1);
-  list = append(list, &num2);
-  list = append(list, &num3);
-  list = append(list, &num4);
+  LinkedList list = create(string1);
 
-  printf("First of list is %d\n", *((int *)list.first->value));
-  printf("Last of list is %d\n", *((int *)list.last->value));
+  list = append(list, string2);
+  list = append(list, string3);
+  list = append(list, string4);
 
+  printNode(first(list));
+  printNode(last(list));
   printf("first list size is %ld\n\n", list.size);
 
   LinkedList secondList = rest(list);
   LinkedList thirdList = rest(secondList);
   LinkedList fourthList = rest(thirdList);
 
-  printf("First of secondList is %d\n", *((int *)secondList.first->value));
-  printf("Last of secondList is %d\n", *((int *)secondList.last->value));
+  printNode(first(secondList));
+  printNode(last(secondList));
+  printf("second list size is %ld\n\n", secondList.size);
 
-  printf("first list size is %ld\n\n", secondList.size);
+  printNode(first(thirdList));
+  printNode(last(thirdList));
+  printf("second list size is %ld\n\n", thirdList.size);
 
-  printf("First of thirdList is %d\n", *((int *)thirdList.first->value));
-  printf("Last of thirdList is %d\n", *((int *)thirdList.last->value));
+  printNode(first(fourthList));
+  printNode(last(fourthList));
+  printf("second list size is %ld\n\n", fourthList.size);
 
-  printf("first list size is %ld\n\n", thirdList.size);
+  printf("Before popping second list last node is:\n");
+  printNode(last(secondList));
+  pop(&secondList);
+  printf("After popping second list last node is:\n");
+  printNode(last(secondList));
+  printf("Appending it back on and last node is\n");
+  secondList = append(secondList, string4);
+  printNode(last(secondList));
 
-  printf("First of fourthList is %d\n", *((int *)fourthList.first->value));
-  printf("Last of fourthList is %d\n", *((int *)fourthList.last->value));
+  int index = 1;
+  printf("String at node %d is:\n", index);
+  getIndex(list, 1);
+  printf("\n\n");
 
-  printf("first list size is %ld\n\n", fourthList.size);
+  size_t i = findFirst(list, "are");
+  size_t unfound = findFirst(list, "derp");
 
-  int newNum = 7;
-  secondList = append(secondList, &newNum);
-  int anohterNum = 9;
-  secondList = prepend(secondList, &anohterNum);
-
-  printf("prepend first of secondList is %d\n",
-         *((int *)secondList.first->value));
-  printf("prepend last of secondList is %d\n",
-         *((int *)secondList.last->value));
-
-  fourthList = prepend(fourthList, &newNum);
-
-  printf("prepend first of fourthList is %d\n",
-         *((int *)fourthList.first->value));
-  printf("prepend last of fourthList is %d\n",
-         *((int *)fourthList.last->value));
-
-  secondList = rest(secondList);
-
-  printf("rest after prepend first of secondList is %d\n",
-         *((int *)secondList.first->value));
-  printf("rest after prepend last of secondList is %d\n\n\n",
-         *((int *)secondList.last->value));
-
-  Node *gotNode = getIndex(list, 2);
-
-  printf("list first before pop %d\n", *((int *)list.first->value));
-  printf("list last before pop %d\n\n\n", *((int *)list.last->value));
-
-  pop(&list);
-
-  printf("list first after pop %d\n", *((int *)list.first->value));
-  printf("list last after pop %d\n\n\n", *((int *)list.last->value));
-
-  size_t i = findFirst(list, 2);
   printf("The index is %ld\n", i);
+  printf("The index is %ld\n\n", unfound);
 
-  size_t unfound = findFirst(list, 22);
-  printf("The index is %ld\n", unfound);
-
-  int found = contains(list, 2);
-  int notFound = contains(list, 22222);
+  int found = contains(list, "how");
+  int notFound = contains(list, "derp");
 
   printf("found is %d\n", found);
   printf("not found is %d\n", notFound);
