@@ -15,18 +15,17 @@ LinkedList randomQuote(LinkedList list) {
   return subList(list, start, end);
 }
 
-int randomNumber(int min_num, int max_num) {
-  int result = 0, low_num = 0, hi_num = 0;
+int randomNumber(int min, int max) {
+  int result = 0, low = 0, hi = 0;
 
-  if (min_num < max_num) {
-    low_num = min_num;
-    hi_num = max_num + 1; // include max_num in output
+  if (min < max) {
+    low = min;
+    hi = max + 1; // include max_num in output
   } else {
-    low_num = max_num + 1; // include max_num in output
-    hi_num = min_num;
+    low = max + 1; // include max_num in output
+    hi = min;
   }
 
   srand(time(NULL));
-  result = (rand() % (hi_num - low_num)) + low_num;
-  return result;
+  return (rand() % (hi - low)) + low;
 }
