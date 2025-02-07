@@ -9,6 +9,12 @@ String *tail(LinkedList list) { return list.last->string; }
 Node *first(LinkedList list) { return list.first; }
 Node *last(LinkedList list) { return list.last; }
 
+void freeNode(Node *node) {
+  free(node->string->string);
+  free(node->string);
+  free(node);
+}
+
 Node *createNode(char *string) {
   Node *node = malloc(sizeof(Node));
   node->string = malloc(sizeof(String));
@@ -57,29 +63,37 @@ void freeList(LinkedList list) {
   }
 }
 
+LinkedList restSublistRecur(Node *node, LinkedList list) {
+  String *currString = malloc(sizeof(String));
+  currString->string = malloc(node->string->length);
+  strcpy(currString->string, node->string->string);
+  list = append(list, currString->string);
+  free(currString->string);
+  free(currString);
+
+  if (node->next == NULL) {
+    return list;
+  } else {
+    return restSublistRecur(node->next, list);
+  }
+}
+
+LinkedList restSublist(Node *node) {
+  LinkedList list = create(node->string->string);
+
+  if (node->next == NULL) {
+    return list;
+  } else {
+    return restSublistRecur(node->next, list);
+  }
+}
+
 LinkedList rest(LinkedList list) {
   if (list.size == 1) {
     printf("List contains only one element\n");
-    return list;
+    return create("");
   }
-
-  Node *currNode = first(list)->next;
-  LinkedList newList;
-  newList = create(currNode->string->string);
-  currNode = currNode->next;
-
-  String *currString = malloc(sizeof(String));
-  while (currNode != NULL) {
-    currString->string = malloc(currNode->string->length);
-    currString->length = currNode->string->length;
-    strcpy(currString->string, currNode->string->string);
-    newList = append(newList, currString->string);
-    currNode = currNode->next;
-    free(currString->string);
-  }
-  free(currString);
-
-  return newList;
+  return restSublist(first(list)->next);
 }
 
 void getIndexRecur(LinkedList list, int index, int currIndex) {
@@ -122,30 +136,26 @@ void pop(LinkedList *list) {
   prevNode->next = NULL;
 }
 
-size_t findFirstRecur(LinkedList list, char *string, size_t currIndex) {
-  LinkedList newList = rest(list);
-  if (strcmp(head(newList)->string, string)) {
-    if (newList.first->next != NULL) {
-      currIndex = findFirstRecur(newList, string, ++currIndex);
-    } else {
-      currIndex = -1;
-    }
+size_t findFirstRecur(Node *node, char *string, size_t currIndex) {
+  if (!strcmp(node->string->string, string)) {
+    return currIndex;
   }
-  freeList(newList);
-  return currIndex;
+
+  if (node->next == NULL) {
+    return -1;
+  }
+
+  return findFirstRecur(node->next, string, ++currIndex);
 }
 
 size_t findFirst(LinkedList list, char *string) {
   size_t currIndex = 0;
-  Node *firstNode = first(list);
-  if (strcmp(head(list)->string, string)) {
-    if (firstNode->next != NULL) {
-      currIndex = findFirstRecur(list, string, ++currIndex);
-    } else {
-      currIndex = -1;
-    }
+  Node *node = first(list);
+  if (!strcmp(node->string->string, string)) {
+    return currIndex;
+  } else {
+    return findFirstRecur(node->next, string, ++currIndex);
   }
-  return currIndex;
 }
 
 int contains(LinkedList list, char *string) {
@@ -192,14 +202,14 @@ void printListFree(LinkedList list) {
   printf("\n");
 }
 
-void removeNode(Node *node, LinkedList list) {
+void removeNode(Node *node, LinkedList *list) {
   Node *prevNode = node;
   Node *rNode = node->next;
   if (rNode->next != NULL) {
     Node *nextNode = rNode->next;
     prevNode->next = nextNode;
   } else {
-    list.last = prevNode;
+    list->last = prevNode;
     prevNode->next = NULL;
   }
   free(rNode->string->string);
@@ -209,7 +219,7 @@ void removeNode(Node *node, LinkedList list) {
 
 int recurRemove(int index, int currIndex, Node *currNode, LinkedList list) {
   if (currIndex == index - 1) {
-    removeNode(currNode, list);
+    removeNode(currNode, &list);
     return 0;
   } else if (currNode->next == NULL) {
     printf("Index out of bounds");
@@ -233,15 +243,15 @@ int removeIndex(LinkedList list, int index) {
   }
 }
 
-Node *getIndexRecurSublist(LinkedList list, int index, int currIndex) {
-  LinkedList newList = rest(list);
+Node *getIndexRecurSublist(Node *node, int index, int currIndex) {
+  if (index == currIndex)
+    return node;
 
-  if (index == currIndex) {
-    printNode(first(newList));
-  } else {
-    return getIndexRecur(list, index, ++currIndex);
+  if (node->next == NULL) {
+    printf("Index ouf of bounds");
   }
-  freeList(newList);
+
+  return getIndexRecurSublist(node->next, index, ++currIndex);
 }
 
 Node *getIndexSublist(LinkedList list, int index) {
@@ -251,13 +261,41 @@ Node *getIndexSublist(LinkedList list, int index) {
   }
 
   int currIndex = 0;
-  if (index == currIndex) {
+  if (index == currIndex)
     return first(list);
-  } else {
-    return getIndexRecurSublist(list, index, ++currIndex);
+
+  return getIndexRecurSublist(first(list), index, currIndex);
+}
+
+void subListRemoveNodes(Node *node) {
+  Node *nextNode = node->next;
+  freeNode(node);
+
+  if (nextNode == NULL)
+    return;
+
+  subListRemoveNodes(nextNode);
+}
+
+Node *subListTrim(Node *node, int index, int currIndex) {
+  if (currIndex == index)
+    return node;
+
+  if (node->next == NULL) {
+    printf("Index out of bounds");
+    return node;
   }
+
+  return subListTrim(node->next, index, ++currIndex);
 }
 
 LinkedList subList(LinkedList list, size_t start, size_t end) {
-  Node *node = getIndexSublist(list, start);
+  Node *startNode = getIndexSublist(list, start);
+  LinkedList subList = restSublist(startNode);
+  Node *endNode = subListTrim(first(subList), end - start, 0);
+  subList.last = endNode;
+  subList.size = end - start + 1;
+  subListRemoveNodes(endNode->next);
+  endNode->next = NULL;
+  return subList;
 }

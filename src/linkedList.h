@@ -106,3 +106,8 @@ void printList(LinkedList);
  * Remove node at index.
  */
 int removeIndex(LinkedList list, int index);
+
+/*
+ * Returns a new sublist of the list. from index `start` to index `end`
+ */
+LinkedList subList(LinkedList list, size_t start, size_t end);
