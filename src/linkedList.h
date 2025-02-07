@@ -47,6 +47,7 @@ Node *last(LinkedList list);
  *  Creates and initilizes a new `LinkedList`
  */
 LinkedList create(char string[]);
+LinkedList createEmpty();
 
 /*
  *  Apeend a `Node` after the final `Node` of a linked list.

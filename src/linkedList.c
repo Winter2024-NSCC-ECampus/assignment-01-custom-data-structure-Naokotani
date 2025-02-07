@@ -34,8 +34,20 @@ LinkedList create(char *string) {
   return list;
 }
 
+LinkedList createEmpty() {
+  LinkedList list;
+  list.first = NULL;
+  list.last = NULL;
+  list.size = 0;
+  return list;
+}
+
 LinkedList append(LinkedList list, char *string) {
   Node *node = createNode(string);
+  if (list.first == NULL) {
+    list.first = node;
+    list.last = node;
+  }
   list.last->next = node;
   list.last = node;
   node->next = NULL;
